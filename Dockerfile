@@ -38,10 +38,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create a non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
-
 # Copy the standalone build (includes server.js + node_modules)
 COPY --from=builder /app/.next/standalone ./
 
@@ -49,17 +45,19 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# Create a persistent volume directory for SQLite
-RUN mkdir -p /app/data && chown -R nextjs:nodejs /app /app/data
+# Copy entrypoint
+COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
-# Point the database at the volume-mounted directory
+# Create data directory for SQLite
+RUN mkdir -p /app/data
+
+# Point the database at the persistent volume directory
 ENV DB_PATH=/app/data/weight-tracker.db
-
-USER nextjs
 
 EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+ENTRYPOINT ["./entrypoint.sh"]
