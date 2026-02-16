@@ -22,8 +22,8 @@ export default function Home() {
       ]);
       const weights = await weightRes.json();
       const calories = await calorieRes.json();
-      setWeightData(weights);
-      setCalorieData(calories);
+      setWeightData(Array.isArray(weights) ? weights : []);
+      setCalorieData(Array.isArray(calories) ? calories : []);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
