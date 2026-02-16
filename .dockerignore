@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Next.js build
+.next
+
+# Database (will be created at runtime)
+*.db
+*.db-journal
+*.db-wal
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+README.md
+.env*
+.agent
