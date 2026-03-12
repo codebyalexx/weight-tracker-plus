@@ -100,7 +100,7 @@ export default function Home() {
           </div>
           <h1 className="header-title">Weight Tracker+</h1>
           <p className="header-subtitle">
-            Track your weight, monitor your calories, and visualize your progress
+            Suivez votre poids, surveillez vos calories et visualisez votre progression
           </p>
         </div>
       </header>
@@ -109,7 +109,7 @@ export default function Home() {
         {loading ? (
           <div className="loading-container">
             <div className="loading-spinner" />
-            <p>Loading your data...</p>
+            <p>Chargement de vos données...</p>
           </div>
         ) : (
           <>
@@ -123,14 +123,14 @@ export default function Home() {
                 onClick={() => setShowWeightModal(true)}
               >
                 <Scale size={20} />
-                <span>Log Weight</span>
+                <span>Ajouter une pesée</span>
               </button>
               <button
                 className="action-btn action-btn-calorie"
                 onClick={() => setShowCalorieModal(true)}
               >
                 <Flame size={20} />
-                <span>Log Calories</span>
+                <span>Ajouter des calories</span>
               </button>
             </section>
 
@@ -157,7 +157,7 @@ export default function Home() {
       </main>
 
       <footer className="app-footer">
-        <p>Weight Tracker+ • 7,700 kcal = 1 kg rule</p>
+        <p>Weight Tracker+ • Règle des 7 700 kcal = 1 kg</p>
       </footer>
 
       {/* Weight Modal */}

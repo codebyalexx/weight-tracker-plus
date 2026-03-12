@@ -26,12 +26,12 @@ export default function WeightChart({ data }: WeightChartProps) {
                     <div className="chart-icon chart-icon-weight">
                         <Scale size={18} />
                     </div>
-                    <h2 className="chart-title">Scale Weight Trend</h2>
+                    <h2 className="chart-title">Tendance du poids (balance)</h2>
                 </div>
                 <div className="chart-empty">
                     <Scale size={48} className="chart-empty-icon" />
-                    <p>No weight data yet</p>
-                    <p className="chart-empty-sub">Start logging your weight to see the trend</p>
+                    <p>Aucune donnée de poids</p>
+                    <p className="chart-empty-sub">Commencez à enregistrer votre poids pour voir la tendance</p>
                 </div>
             </div>
         );
@@ -63,15 +63,15 @@ export default function WeightChart({ data }: WeightChartProps) {
 
             <div className="chart-stats">
                 <div className="stat">
-                    <span className="stat-label">Start</span>
+                    <span className="stat-label">Début</span>
                     <span className="stat-value">{startWeight.toFixed(1)} kg</span>
                 </div>
                 <div className="stat">
-                    <span className="stat-label">Current</span>
+                    <span className="stat-label">Actuel</span>
                     <span className="stat-value stat-value-highlight">{currentWeight.toFixed(1)} kg</span>
                 </div>
                 <div className="stat">
-                    <span className="stat-label">Change</span>
+                    <span className="stat-label">Évolution</span>
                     <span className={`stat-value ${totalChange < 0 ? "stat-positive" : totalChange > 0 ? "stat-negative" : ""}`}>
                         {totalChange > 0 ? "+" : ""}{totalChange.toFixed(1)} kg
                     </span>
@@ -112,14 +112,14 @@ export default function WeightChart({ data }: WeightChartProps) {
                             }}
                             labelStyle={{ color: "#94a3b8", marginBottom: "4px" }}
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            formatter={((value: number) => [`${value.toFixed(1)} kg`, "Weight"]) as any}
+                            formatter={((value: number) => [`${value.toFixed(1)} kg`, "Poids"]) as any}
                         />
                         <ReferenceLine
                             y={avgWeight}
                             stroke="rgba(99, 102, 241, 0.3)"
                             strokeDasharray="5 5"
                             label={{
-                                value: `Avg: ${avgWeight.toFixed(1)}`,
+                                value: `Moy: ${avgWeight.toFixed(1)}`,
                                 fill: "#6366f1",
                                 fontSize: 11,
                                 position: "insideTopRight",

@@ -40,7 +40,7 @@ export default function DataTable({
     return (
         <div className="card table-card">
             <h2 className="card-title" style={{ marginBottom: "1rem" }}>
-                📋 History
+                📋 Historique
             </h2>
 
             <div className="table-wrapper">
@@ -48,11 +48,11 @@ export default function DataTable({
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Weight (kg)</th>
-                            <th>Eaten (kcal)</th>
-                            <th>Burned (kcal)</th>
+                            <th>Poids (kg)</th>
+                            <th>Mangé (kcal)</th>
+                            <th>Brûlé (kcal)</th>
                             <th>Objectif</th>
-                            <th>Deficit</th>
+                            <th>Déficit</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -67,7 +67,7 @@ export default function DataTable({
                             return (
                                 <tr key={date}>
                                     <td className="table-date">
-                                        {format(parseISO(date), "MMM d, yyyy")}
+                                        {format(parseISO(date), "d MMM yyyy")}
                                     </td>
                                     <td>
                                         {weight ? (
@@ -122,7 +122,7 @@ export default function DataTable({
                                             <button
                                                 onClick={() => onDeleteWeight(weight.id)}
                                                 className="delete-btn"
-                                                title="Delete weight entry"
+                                                title="Supprimer la pesée"
                                             >
                                                 <Trash2 size={14} />
                                             </button>
@@ -131,7 +131,7 @@ export default function DataTable({
                                             <button
                                                 onClick={() => onDeleteCalorie(calorie.id)}
                                                 className="delete-btn"
-                                                title="Delete calorie entry"
+                                                title="Supprimer l'entrée calories"
                                             >
                                                 <Trash2 size={14} />
                                             </button>

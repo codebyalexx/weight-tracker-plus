@@ -33,12 +33,12 @@ export default function EstimatedWeightChart({
                     <div className="chart-icon chart-icon-calorie">
                         <Flame size={18} />
                     </div>
-                    <h2 className="chart-title">Estimated Weight (from Calories)</h2>
+                    <h2 className="chart-title">Poids estimé (via calories)</h2>
                 </div>
                 <div className="chart-empty">
                     <Flame size={48} className="chart-empty-icon" />
-                    <p>No calorie data yet</p>
-                    <p className="chart-empty-sub">Start logging your daily calories to see the estimated trend</p>
+                    <p>Aucune donnée de calories</p>
+                    <p className="chart-empty-sub">Commencez à enregistrer vos calories pour voir la tendance estimée</p>
                 </div>
             </div>
         );
@@ -102,17 +102,17 @@ export default function EstimatedWeightChart({
 
             <div className="chart-stats">
                 <div className="stat">
-                    <span className="stat-label">Start</span>
+                    <span className="stat-label">Début</span>
                     <span className="stat-value">{startingWeight.toFixed(1)} kg</span>
                 </div>
                 <div className="stat">
-                    <span className="stat-label">Estimated Now</span>
+                    <span className="stat-label">Estimé actuel</span>
                     <span className="stat-value stat-value-highlight">
                         {chartData[chartData.length - 1].estimatedWeight.toFixed(1)} kg
                     </span>
                 </div>
                 <div className="stat">
-                    <span className="stat-label">Est. Change</span>
+                    <span className="stat-label">Évolution est.</span>
                     <span
                         className={`stat-value ${totalEstimatedChange < 0 ? "stat-positive" : totalEstimatedChange > 0 ? "stat-negative" : ""}`}
                     >
@@ -121,7 +121,7 @@ export default function EstimatedWeightChart({
                     </span>
                 </div>
                 <div className="stat">
-                    <span className="stat-label">Avg Deficit</span>
+                    <span className="stat-label">Déficit moy.</span>
                     <span className={`stat-value ${avgDailyDeficit > 0 ? "stat-positive" : "stat-negative"}`}>
                         {avgDailyDeficit > 0 ? "−" : "+"}{Math.abs(avgDailyDeficit)} kcal
                     </span>
@@ -130,8 +130,8 @@ export default function EstimatedWeightChart({
 
             <div className="chart-info">
                 <p>
-                    Based on the <strong>7,700 kcal = 1 kg</strong> rule. Your daily calorie
-                    deficit/surplus is accumulated to estimate weight change from your starting weight.
+                    Basé sur la règle <strong>7 700 kcal = 1 kg</strong>. Votre déficit/surplus calorique
+                    quotidien est accumulé pour estimer l'évolution de votre poids.
                 </p>
             </div>
 
@@ -171,7 +171,7 @@ export default function EstimatedWeightChart({
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             formatter={((value: number, name: string) => {
                                 if (name === "estimatedWeight")
-                                    return [`${value.toFixed(1)} kg`, "Est. Weight"];
+                                    return [`${value.toFixed(1)} kg`, "Poids est."];
                                 return [value, name];
                             }) as any}
                         />

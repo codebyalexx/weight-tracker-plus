@@ -38,8 +38,8 @@ export default function WeightForm({ onSubmit }: WeightFormProps) {
                     <Scale size={20} />
                 </div>
                 <div>
-                    <h2 className="card-title">Log Weight</h2>
-                    <p className="card-subtitle">Record your scale reading</p>
+                    <h2 className="card-title">Ajouter une pesée</h2>
+                    <p className="card-subtitle">Enregistrez votre poids sur la balance</p>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@ export default function WeightForm({ onSubmit }: WeightFormProps) {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="weight-value" className="form-label">Weight (kg)</label>
+                    <label htmlFor="weight-value" className="form-label">Poids (kg)</label>
                     <input
                         id="weight-value"
                         type="number"
@@ -66,7 +66,7 @@ export default function WeightForm({ onSubmit }: WeightFormProps) {
                         max="500"
                         value={weight}
                         onChange={(e) => setWeight(e.target.value)}
-                        placeholder="e.g. 85.3"
+                        placeholder="ex. 85.3"
                         className="form-input"
                         required
                     />
@@ -80,12 +80,12 @@ export default function WeightForm({ onSubmit }: WeightFormProps) {
                     {isSubmitting ? (
                         <span className="btn-loading">
                             <span className="spinner" />
-                            Saving...
+                            Enregistrement...
                         </span>
                     ) : showSuccess ? (
-                        <span className="btn-success-text">✓ Saved!</span>
+                        <span className="btn-success-text">✓ Enregistré !</span>
                     ) : (
-                        "Save Weight"
+                        "Enregistrer le poids"
                     )}
                 </button>
             </form>

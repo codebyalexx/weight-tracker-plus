@@ -88,8 +88,8 @@ export default function CalorieForm({ onSubmit }: CalorieFormProps) {
                     <Flame size={20} />
                 </div>
                 <div>
-                    <h2 className="card-title">Log Calories</h2>
-                    <p className="card-subtitle">Track daily intake & expenditure</p>
+                    <h2 className="card-title">Ajouter des calories</h2>
+                    <p className="card-subtitle">Suivez vos apports et dépenses quotidiennes</p>
                 </div>
             </div>
 
@@ -126,7 +126,7 @@ export default function CalorieForm({ onSubmit }: CalorieFormProps) {
 
                 <div className="form-group">
                     <label htmlFor="calories-consumed" className="form-label">
-                        Calories Eaten (kcal)
+                        Calories consommées (kcal)
                     </label>
                     <input
                         id="calories-consumed"
@@ -136,7 +136,7 @@ export default function CalorieForm({ onSubmit }: CalorieFormProps) {
                         max="20000"
                         value={consumed}
                         onChange={(e) => setConsumed(e.target.value)}
-                        placeholder="e.g. 1800"
+                        placeholder="ex. 1800"
                         className="form-input"
                         required
                     />
@@ -144,7 +144,7 @@ export default function CalorieForm({ onSubmit }: CalorieFormProps) {
 
                 <div className="form-group">
                     <label htmlFor="calories-burned" className="form-label">
-                        Calories Burned (kcal)
+                        Calories brûlées (kcal)
                     </label>
                     <input
                         id="calories-burned"
@@ -154,7 +154,7 @@ export default function CalorieForm({ onSubmit }: CalorieFormProps) {
                         max="20000"
                         value={burned}
                         onChange={(e) => setBurned(e.target.value)}
-                        placeholder="e.g. 2200"
+                        placeholder="ex. 2200"
                         className="form-input"
                         required
                     />
@@ -162,10 +162,10 @@ export default function CalorieForm({ onSubmit }: CalorieFormProps) {
 
                 {hasValues && goalStatus && (
                     <div className={`deficit-badge deficit-${goalStatus === "positive" ? "positive" : goalStatus === "warning" ? "warning" : "negative"}`}>
-                        <span className="deficit-label">Daily Balance:</span>
+                        <span className="deficit-label">Bilan du jour :</span>
                         <span className="deficit-value">
                             {deficit > 0 ? "−" : "+"}{Math.abs(deficit).toLocaleString()} kcal
-                            {deficit > 0 ? " deficit" : deficit < 0 ? " surplus" : ""}
+                            {deficit > 0 ? " déficit" : deficit < 0 ? " surplus" : ""}
                         </span>
                     </div>
                 )}
@@ -178,12 +178,12 @@ export default function CalorieForm({ onSubmit }: CalorieFormProps) {
                     {isSubmitting ? (
                         <span className="btn-loading">
                             <span className="spinner" />
-                            Saving...
+                            Enregistrement...
                         </span>
                     ) : showSuccess ? (
-                        <span className="btn-success-text">✓ Saved!</span>
+                        <span className="btn-success-text">✓ Enregistré !</span>
                     ) : (
-                        "Save Calories"
+                        "Enregistrer les calories"
                     )}
                 </button>
             </form>

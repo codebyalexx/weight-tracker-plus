@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Weight Tracker+ | Daily Weight & Calorie Tracking",
+  title: "Weight Tracker+ | Suivi de poids & calories",
   description:
-    "Track your weight loss journey with real scale measurements and calorie-based estimations. Visualize your progress with beautiful charts.",
+    "Suivez votre parcours de perte de poids avec des pesées réelles et des estimations basées sur les calories. Visualisez votre progression avec de beaux graphiques.",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body>{children}</body>
     </html>
   );
