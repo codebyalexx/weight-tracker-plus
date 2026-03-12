@@ -5,14 +5,17 @@ import WeightForm from "@/components/WeightForm";
 import CalorieForm from "@/components/CalorieForm";
 import WeightChart from "@/components/WeightChart";
 import EstimatedWeightChart from "@/components/EstimatedWeightChart";
+import StatsOverview from "@/components/StatsOverview";
 import DataTable from "@/components/DataTable";
-import { WeightEntry, CalorieEntry } from "@/lib/db";
-import { TrendingDown, Activity } from "lucide-react";
+import { WeightEntry, CalorieEntry, GoalType } from "@/lib/db";
+import { TrendingDown, Scale, Flame, X } from "lucide-react";
 
 export default function Home() {
   const [weightData, setWeightData] = useState<WeightEntry[]>([]);
   const [calorieData, setCalorieData] = useState<CalorieEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWeightModal, setShowWeightModal] = useState(false);
+  const [showCalorieModal, setShowCalorieModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -43,20 +46,23 @@ export default function Home() {
     });
     if (!res.ok) throw new Error("Failed to save weight");
     await fetchData();
+    setShowWeightModal(false);
   };
 
   const handleCalorieSubmit = async (
     date: string,
     calories_consumed: number,
-    calories_burned: number
+    calories_burned: number,
+    goal: GoalType
   ) => {
     const res = await fetch("/api/calories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date, calories_consumed, calories_burned }),
+      body: JSON.stringify({ date, calories_consumed, calories_burned, goal }),
     });
     if (!res.ok) throw new Error("Failed to save calories");
     await fetchData();
+    setShowCalorieModal(false);
   };
 
   const handleDeleteWeight = async (id: number) => {
@@ -71,6 +77,18 @@ export default function Home() {
     await fetchData();
   };
 
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowWeightModal(false);
+        setShowCalorieModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
+
   return (
     <div className="app-container">
       {/* Hero Header */}
@@ -84,19 +102,6 @@ export default function Home() {
           <p className="header-subtitle">
             Track your weight, monitor your calories, and visualize your progress
           </p>
-          {!loading && (weightData.length > 0 || calorieData.length > 0) && (
-            <div className="header-stats">
-              <div className="header-stat">
-                <Activity size={16} />
-                <span>{weightData.length} weigh-ins</span>
-              </div>
-              <div className="header-stat-divider" />
-              <div className="header-stat">
-                <Activity size={16} />
-                <span>{calorieData.length} calorie logs</span>
-              </div>
-            </div>
-          )}
         </div>
       </header>
 
@@ -108,10 +113,25 @@ export default function Home() {
           </div>
         ) : (
           <>
-            {/* Input Forms */}
-            <section className="forms-section">
-              <WeightForm onSubmit={handleWeightSubmit} />
-              <CalorieForm onSubmit={handleCalorieSubmit} />
+            {/* Stats Overview */}
+            <StatsOverview weightData={weightData} calorieData={calorieData} />
+
+            {/* Action Buttons */}
+            <section className="action-buttons">
+              <button
+                className="action-btn action-btn-weight"
+                onClick={() => setShowWeightModal(true)}
+              >
+                <Scale size={20} />
+                <span>Log Weight</span>
+              </button>
+              <button
+                className="action-btn action-btn-calorie"
+                onClick={() => setShowCalorieModal(true)}
+              >
+                <Flame size={20} />
+                <span>Log Calories</span>
+              </button>
             </section>
 
             {/* Charts */}
@@ -139,6 +159,38 @@ export default function Home() {
       <footer className="app-footer">
         <p>Weight Tracker+ • 7,700 kcal = 1 kg rule</p>
       </footer>
+
+      {/* Weight Modal */}
+      {showWeightModal && (
+        <div className="modal-overlay" onClick={() => setShowWeightModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="modal-close"
+              onClick={() => setShowWeightModal(false)}
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+            <WeightForm onSubmit={handleWeightSubmit} />
+          </div>
+        </div>
+      )}
+
+      {/* Calorie Modal */}
+      {showCalorieModal && (
+        <div className="modal-overlay" onClick={() => setShowCalorieModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="modal-close"
+              onClick={() => setShowCalorieModal(false)}
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+            <CalorieForm onSubmit={handleCalorieSubmit} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

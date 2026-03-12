@@ -5,6 +5,8 @@ const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), "weight-tracker.
 
 let db: Database.Database | null = null;
 
+export type GoalType = "deficit" | "maintenance" | "bulk";
+
 export function getDb(): Database.Database {
   if (!db) {
     db = new Database(DB_PATH);
@@ -37,6 +39,14 @@ function initializeDb(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_weight_date ON weight_entries(date);
     CREATE INDEX IF NOT EXISTS idx_calorie_date ON calorie_entries(date);
   `);
+
+  // Safe migration: add goal column if it doesn't exist
+  // Existing rows will get 'deficit' as default — no breaking change
+  try {
+    db.exec(`ALTER TABLE calorie_entries ADD COLUMN goal TEXT NOT NULL DEFAULT 'deficit'`);
+  } catch {
+    // Column already exists, ignore the error
+  }
 }
 
 // Types
@@ -53,6 +63,7 @@ export interface CalorieEntry {
   date: string;
   calories_consumed: number;
   calories_burned: number;
+  goal: GoalType;
   created_at: string;
   updated_at: string;
 }

@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { date, calories_consumed, calories_burned } = body;
+        const { date, calories_consumed, calories_burned, goal } = body;
 
         if (!date || calories_consumed === undefined || calories_burned === undefined) {
             return NextResponse.json(
@@ -29,17 +29,20 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        const validGoal = ["deficit", "maintenance", "bulk"].includes(goal) ? goal : "deficit";
+
         const db = getDb();
         const stmt = db.prepare(`
-      INSERT INTO calorie_entries (date, calories_consumed, calories_burned, updated_at)
-      VALUES (?, ?, ?, datetime('now'))
+      INSERT INTO calorie_entries (date, calories_consumed, calories_burned, goal, updated_at)
+      VALUES (?, ?, ?, ?, datetime('now'))
       ON CONFLICT(date) DO UPDATE SET
         calories_consumed = excluded.calories_consumed,
         calories_burned = excluded.calories_burned,
+        goal = excluded.goal,
         updated_at = datetime('now')
     `);
 
-        stmt.run(date, calories_consumed, calories_burned);
+        stmt.run(date, calories_consumed, calories_burned, validGoal);
 
         const entry = db
             .prepare("SELECT * FROM calorie_entries WHERE date = ?")

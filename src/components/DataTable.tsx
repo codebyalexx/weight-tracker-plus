@@ -2,7 +2,13 @@
 
 import { format, parseISO } from "date-fns";
 import { Trash2, Scale, Flame } from "lucide-react";
-import { WeightEntry, CalorieEntry } from "@/lib/db";
+import { WeightEntry, CalorieEntry, GoalType } from "@/lib/db";
+
+const GOAL_LABELS: Record<GoalType, string> = {
+    deficit: "Sèche",
+    maintenance: "Maintien",
+    bulk: "Prise",
+};
 
 interface DataTableProps {
     weightData: WeightEntry[];
@@ -45,6 +51,7 @@ export default function DataTable({
                             <th>Weight (kg)</th>
                             <th>Eaten (kcal)</th>
                             <th>Burned (kcal)</th>
+                            <th>Objectif</th>
                             <th>Deficit</th>
                             <th></th>
                         </tr>
@@ -85,6 +92,15 @@ export default function DataTable({
                                         {calorie ? (
                                             <span className="table-calorie">
                                                 {calorie.calories_burned.toLocaleString()}
+                                            </span>
+                                        ) : (
+                                            <span className="table-empty">—</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        {calorie ? (
+                                            <span className={`table-goal-badge table-goal-${calorie.goal || "deficit"}`}>
+                                                {GOAL_LABELS[calorie.goal || "deficit"]}
                                             </span>
                                         ) : (
                                             <span className="table-empty">—</span>
