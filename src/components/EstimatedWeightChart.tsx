@@ -44,17 +44,16 @@ export default function EstimatedWeightChart({
         );
     }
 
-    // Get the starting weight from the first weight entry, or use a default
+    // Sort weight entries by date for baseline lookups
     const sortedWeightData = [...weightData].sort(
         (a, b) => a.date.localeCompare(b.date)
     );
 
-    // Find the earliest weight entry on or before the first calorie entry
+    // Find the starting weight: closest scale reading on or before first calorie date
     const firstCalorieDate = calorieData[0].date;
     let startingWeight = 80; // default if no weight data
 
     if (sortedWeightData.length > 0) {
-        // Find the closest weight entry to or before the first calorie entry
         const prior = sortedWeightData.filter(
             (w) => w.date <= firstCalorieDate
         );
@@ -65,20 +64,40 @@ export default function EstimatedWeightChart({
         }
     }
 
-    // Calculate cumulative weight change based on calorie deficit
-    let cumulativeDeficit = 0;
-    const chartData = calorieData.map((entry, index) => {
+    // Calculate estimated weight, resetting baseline at every real scale entry.
+    // When a new scale reading exists, the curve "snaps" to the real weight
+    // and continues estimating from there.
+    let currentBaseline = startingWeight;
+    let baselineDate = "";
+    let deficitSinceBaseline = 0;
+
+    const chartData = calorieData.map((entry) => {
+        // Find the most recent scale reading on or before this date
+        const scaleReadings = sortedWeightData.filter(
+            (w) => w.date <= entry.date
+        );
+
+        if (scaleReadings.length > 0) {
+            const latestScale = scaleReadings[scaleReadings.length - 1];
+            // If this is a newer scale reading than our current anchor, reset
+            if (latestScale.date !== baselineDate) {
+                currentBaseline = latestScale.weight;
+                baselineDate = latestScale.date;
+                deficitSinceBaseline = 0;
+            }
+        }
+
         const dailyDeficit = entry.calories_burned - entry.calories_consumed;
-        cumulativeDeficit += dailyDeficit;
-        const estimatedWeightChange = cumulativeDeficit / KCAL_PER_KG;
-        const estimatedWeight = startingWeight - estimatedWeightChange;
+        deficitSinceBaseline += dailyDeficit;
+        const estimatedWeightChange = deficitSinceBaseline / KCAL_PER_KG;
+        const estimatedWeight = currentBaseline - estimatedWeightChange;
 
         return {
             date: entry.date,
-            label: format(parseISO(entry.date), "MMM d"),
+            label: format(parseISO(entry.date), "d MMM"),
             estimatedWeight: parseFloat(estimatedWeight.toFixed(2)),
             dailyDeficit: Math.round(dailyDeficit),
-            cumulativeDeficit: Math.round(cumulativeDeficit),
+            cumulativeDeficit: Math.round(deficitSinceBaseline),
         };
     });
 
