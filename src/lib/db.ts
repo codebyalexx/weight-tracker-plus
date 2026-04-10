@@ -36,6 +36,18 @@ function initializeDb(db: Database.Database) {
       updated_at TEXT DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS goals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      target_weight REAL NOT NULL,
+      mode TEXT NOT NULL CHECK(mode IN ('cut', 'bulk')),
+      initial_intensity INTEGER NOT NULL,
+      start_date TEXT NOT NULL,
+      start_weight REAL NOT NULL,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+
     CREATE INDEX IF NOT EXISTS idx_weight_date ON weight_entries(date);
     CREATE INDEX IF NOT EXISTS idx_calorie_date ON calorie_entries(date);
   `);
@@ -64,6 +76,18 @@ export interface CalorieEntry {
   calories_consumed: number;
   calories_burned: number;
   goal: GoalType;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GoalRow {
+  id: number;
+  target_weight: number;
+  mode: "cut" | "bulk";
+  initial_intensity: number;
+  start_date: string;
+  start_weight: number;
+  active: number; // SQLite boolean
   created_at: string;
   updated_at: string;
 }

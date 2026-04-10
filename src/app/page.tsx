@@ -7,26 +7,32 @@ import WeightChart from "@/components/WeightChart";
 import EstimatedWeightChart from "@/components/EstimatedWeightChart";
 import StatsOverview from "@/components/StatsOverview";
 import DataTable from "@/components/DataTable";
-import { WeightEntry, CalorieEntry, GoalType } from "@/lib/db";
+import GoalPanel from "@/components/GoalPanel";
+import GoalProjectionChart from "@/components/GoalProjectionChart";
+import { WeightEntry, CalorieEntry, GoalType, GoalRow } from "@/lib/db";
 import { TrendingDown, Scale, Flame, X } from "lucide-react";
 
 export default function Home() {
   const [weightData, setWeightData] = useState<WeightEntry[]>([]);
   const [calorieData, setCalorieData] = useState<CalorieEntry[]>([]);
+  const [goal, setGoal] = useState<GoalRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [showWeightModal, setShowWeightModal] = useState(false);
   const [showCalorieModal, setShowCalorieModal] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [weightRes, calorieRes] = await Promise.all([
+      const [weightRes, calorieRes, goalRes] = await Promise.all([
         fetch("/api/weight"),
         fetch("/api/calories"),
+        fetch("/api/goal"),
       ]);
       const weights = await weightRes.json();
       const calories = await calorieRes.json();
+      const goalData = await goalRes.json();
       setWeightData(Array.isArray(weights) ? weights : []);
       setCalorieData(Array.isArray(calories) ? calories : []);
+      setGoal(goalData && goalData.id ? goalData : null);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
@@ -133,6 +139,28 @@ export default function Home() {
                 <span>Ajouter des calories</span>
               </button>
             </section>
+
+            {/* Goal System */}
+            <section className="goal-section">
+              <GoalPanel
+                weightData={weightData}
+                calorieData={calorieData}
+                goal={goal}
+                onGoalCreated={fetchData}
+                onGoalDeleted={fetchData}
+              />
+            </section>
+
+            {/* Goal Projection Chart (only if active goal) */}
+            {goal && (
+              <section className="charts-section charts-section-full">
+                <GoalProjectionChart
+                  goal={goal}
+                  weightData={weightData}
+                  calorieData={calorieData}
+                />
+              </section>
+            )}
 
             {/* Charts */}
             <section className="charts-section">
