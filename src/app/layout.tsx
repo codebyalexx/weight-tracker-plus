@@ -3,11 +3,11 @@ import Navigation from "@/components/Navigation";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CaloQuest | Ton aventure calorique",
+  title: "Kcalm | Ton aventure calorique",
   description: "Deviens le maître de ton alimentation. Un tracking fun et motivant jour après jour !",
   manifest: "/manifest.json",
   appleWebApp: {
-    title: "CaloQuest",
+    title: "Kcalm",
     statusBarStyle: "default",
   },
 };

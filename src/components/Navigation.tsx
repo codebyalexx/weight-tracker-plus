@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Flame, BarChart2 } from "lucide-react";
+import { Menu, X, Flame, BarChart2, CalendarDays } from "lucide-react";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +10,7 @@ export default function Navigation() {
     <header className="flex items-center justify-between p-4 bg-white border-b-2 border-gray-200 sticky top-0 z-50">
       <Link href="/" className="flex items-center gap-2">
         <Flame className="text-[#58CC02]" size={30} strokeWidth={2.5} />
-        <span className="text-xl font-bold text-[#4B4B4B] tracking-tight">CaloQuest</span>
+        <span className="text-xl font-bold text-[#4B4B4B] tracking-tight">Kcalm</span>
       </Link>
 
       <button
@@ -30,6 +30,14 @@ export default function Navigation() {
           >
             <Flame className="text-[#ff9600]" size={24} strokeWidth={2.5} />
             Tracking
+          </Link>
+          <Link
+             href="/calendar"
+             onClick={() => setIsOpen(false)}
+             className="flex items-center gap-3 p-4 border-b-2 border-gray-100 hover:bg-gray-50 active:bg-gray-100"
+          >
+             <CalendarDays className="text-[#ea2b2b]" size={24} strokeWidth={2.5} />
+             Calendrier
           </Link>
           <Link
             href="/insights"
