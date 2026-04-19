@@ -124,7 +124,7 @@ export default function Home() {
         if (!entry) return "bg-main-red border-main-red-shadow text-white"; // Missing
 
         const deficit = entry.calories_burned - entry.calories_consumed;
-        const status = getGoalStatus(deficit, entry.goal_type as GoalType);
+        const status = getGoalStatus(deficit, entry.goal as GoalType);
         
         if (status === "positive" || status === "warning") {
             const isGreen = status === "positive";
@@ -252,7 +252,7 @@ export default function Home() {
                             <div>
                                 <div className="text-xs font-bold text-text-muted uppercase">Objectif</div>
                                 <div className="font-extrabold text-main-blue text-lg">
-                                    {GOAL_LABELS[activeCalorieEntry.goal_type as GoalType] || "Sèche"}
+                                    {GOAL_LABELS[activeCalorieEntry.goal as GoalType] || "Sèche"}
                                 </div>
                             </div>
                             <div>
