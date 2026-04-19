@@ -5,6 +5,7 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { fr } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CalorieEntry, GoalType } from "@/lib/db";
+import Link from "next/link";
 
 function getGoalStatus(deficit: number, goal: GoalType): "positive" | "warning" | "negative" {
     switch (goal) {
@@ -107,12 +108,13 @@ export default function CalendarPage() {
                         const colorClass = getDayColor(d);
                         const isCurrentDay = isToday(d);
                         return (
-                            <div 
+                            <Link 
+                                href={`/?date=${format(d, "yyyy-MM-dd")}`}
                                 key={d.toISOString()}
                                 className={`flex items-center justify-center h-14 rounded-xl border-b-4 ${colorClass} ${isCurrentDay ? 'ring-2 ring-offset-2 ring-main-blue' : ''}`}
                             >
                                 <span className="font-extrabold">{format(d, "d")}</span>
-                            </div>
+                            </Link>
                         )
                     })}
                 </div>

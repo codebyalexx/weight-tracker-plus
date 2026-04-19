@@ -86,6 +86,17 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
 
     const [activeDateObj, setActiveDateObj] = useState(new Date());
+    
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const queryDate = new URLSearchParams(window.location.search).get("date");
+            if (queryDate) {
+                const parsed = parseISO(queryDate);
+                if (!isNaN(parsed.getTime())) setActiveDateObj(parsed);
+            }
+        }
+    }, []);
+
     const activeDate = format(activeDateObj, "yyyy-MM-dd");
 
     const [modal, setModal] = useState<"none" | "calories" | "weight">("none");
