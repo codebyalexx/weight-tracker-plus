@@ -253,7 +253,7 @@ export default function Insights() {
                                     <Tooltip 
                                         contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontWeight: 'bold' }}
                                         labelStyle={{ color: '#afafaf', marginBottom: '8px' }}
-                                        formatter={(val: number) => [val > 0 ? `-${val} kcal (Déficit)` : `+${Math.abs(val)} kcal (Surplus)`, 'Bilan']}
+                                        formatter={(val: number | string | undefined) => [Number(val) > 0 ? `-${val} kcal (Déficit)` : `+${Math.abs(Number(val))} kcal (Surplus)`, 'Bilan']}
                                     />
                                     <ReferenceLine y={0} stroke="#afafaf" strokeDasharray="3 3" />
                                     <Area 

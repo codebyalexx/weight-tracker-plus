@@ -131,7 +131,7 @@ export function generatePhases(
         );
 
         // Determine phase type
-        let phaseType: PhaseType = mode === "cut" ? "cut" : "bulk";
+        const phaseType: PhaseType = mode === "cut" ? "cut" : "bulk";
 
         // Insert maintenance/refeed phases for sustainability
         // Every 3 active phases, add a 1-week maintenance/refeed
