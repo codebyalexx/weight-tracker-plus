@@ -6,13 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "import-sqlite": "tsx scripts/import-sqlite.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "better-auth": "^1.6.8",
     "better-sqlite3": "^12.6.2",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.564.0",
     "next": "16.1.6",
+    "prisma": "^6.19.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.7.0"
@@ -26,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   },
   "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"

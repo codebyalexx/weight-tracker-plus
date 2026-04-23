@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  serverExternalPackages: ["better-sqlite3"],
+  // better-sqlite3 ships native binaries; keep it external so the Next bundler
+  // doesn't try to bundle them into the server build.
+  serverExternalPackages: ["better-sqlite3", "@prisma/client", "prisma"],
 };
 
 export default nextConfig;

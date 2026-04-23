@@ -1,12 +1,16 @@
-import { getDb } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 
 export async function GET() {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
-        const db = getDb();
-        const entries = db
-            .prepare("SELECT * FROM weight_entries ORDER BY date ASC")
-            .all();
+        const entries = await prisma.weightEntry.findMany({
+            where: { user_id: auth.userId },
+            orderBy: { date: "asc" },
+        });
         return NextResponse.json(entries);
     } catch (error) {
         console.error("Error fetching weight entries:", error);
@@ -18,6 +22,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
         const body = await request.json();
         const { date, weight } = body;
@@ -29,20 +36,15 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const db = getDb();
-        const stmt = db.prepare(`
-      INSERT INTO weight_entries (date, weight, updated_at)
-      VALUES (?, ?, datetime('now'))
-      ON CONFLICT(date) DO UPDATE SET
-        weight = excluded.weight,
-        updated_at = datetime('now')
-    `);
-
-        stmt.run(date, weight);
-
-        const entry = db
-            .prepare("SELECT * FROM weight_entries WHERE date = ?")
-            .get(date);
+        const entry = await prisma.weightEntry.upsert({
+            where: { user_id_date: { user_id: auth.userId, date } },
+            update: { weight: Number(weight) },
+            create: {
+                user_id: auth.userId,
+                date,
+                weight: Number(weight),
+            },
+        });
 
         return NextResponse.json(entry, { status: 201 });
     } catch (error) {
@@ -55,6 +57,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get("id");
@@ -66,8 +71,9 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        const db = getDb();
-        db.prepare("DELETE FROM weight_entries WHERE id = ?").run(id);
+        await prisma.weightEntry.deleteMany({
+            where: { id: Number(id), user_id: auth.userId },
+        });
 
         return NextResponse.json({ success: true });
     } catch (error) {

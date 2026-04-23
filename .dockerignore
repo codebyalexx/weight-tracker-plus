@@ -5,10 +5,11 @@ npm-debug.log*
 # Next.js build
 .next
 
-# Database (will be created at runtime)
+# Legacy SQLite files — data lives in Postgres now
 *.db
 *.db-journal
 *.db-wal
+*.db-shm
 
 # Git
 .git

@@ -1,0 +1,128 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================
+// better-auth models
+// https://better-auth.com/docs/concepts/database
+// =============================================================
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+
+  sessions       Session[]
+  accounts       Account[]
+  weightEntries  WeightEntry[]
+  calorieEntries CalorieEntry[]
+  goals          Goal[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+// =============================================================
+// Application models — scoped by userId
+// Field names kept snake_case to match the client DTO shape.
+// =============================================================
+
+model WeightEntry {
+  id         Int      @id @default(autoincrement())
+  date       String
+  weight     Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, date])
+  @@index([user_id, date])
+  @@map("weight_entries")
+}
+
+model CalorieEntry {
+  id                Int      @id @default(autoincrement())
+  date              String
+  calories_consumed Float    @default(0)
+  calories_burned   Float    @default(0)
+  goal              String   @default("deficit")
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  user_id           String
+  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, date])
+  @@index([user_id, date])
+  @@map("calorie_entries")
+}
+
+model Goal {
+  id                Int      @id @default(autoincrement())
+  target_weight     Float
+  mode              String
+  initial_intensity Int
+  start_date        String
+  start_weight      Float
+  active            Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  user_id           String
+  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, active])
+  @@map("goals")
+}

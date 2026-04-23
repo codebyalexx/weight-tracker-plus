@@ -1,24 +1,28 @@
-import { getDb, GoalRow } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 
-// GET: Fetch the active goal (or all goals)
 export async function GET(request: NextRequest) {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
-        const db = getDb();
         const { searchParams } = new URL(request.url);
         const activeOnly = searchParams.get("active") !== "false";
 
         if (activeOnly) {
-            const goal = db
-                .prepare("SELECT * FROM goals WHERE active = 1 ORDER BY created_at DESC LIMIT 1")
-                .get() as GoalRow | undefined;
+            const goal = await prisma.goal.findFirst({
+                where: { user_id: auth.userId, active: true },
+                orderBy: { created_at: "desc" },
+            });
             return NextResponse.json(goal ?? null);
-        } else {
-            const goals = db
-                .prepare("SELECT * FROM goals ORDER BY created_at DESC")
-                .all();
-            return NextResponse.json(goals);
         }
+
+        const goals = await prisma.goal.findMany({
+            where: { user_id: auth.userId },
+            orderBy: { created_at: "desc" },
+        });
+        return NextResponse.json(goals);
     } catch (error) {
         console.error("Error fetching goals:", error);
         return NextResponse.json(
@@ -28,8 +32,10 @@ export async function GET(request: NextRequest) {
     }
 }
 
-// POST: Create a new goal (deactivates existing ones)
 export async function POST(request: NextRequest) {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
         const body = await request.json();
         const { target_weight, mode, initial_intensity, start_date, start_weight } = body;
@@ -48,7 +54,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Validate intensity bounds
         if (mode === "cut" && (initial_intensity > -300 || initial_intensity < -1000)) {
             return NextResponse.json(
                 { error: "Deficit must be between -300 and -1000 kcal/day" },
@@ -62,22 +67,23 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const db = getDb();
-
-        // Deactivate all existing goals
-        db.prepare("UPDATE goals SET active = 0, updated_at = datetime('now')").run();
-
-        // Create new goal
-        const stmt = db.prepare(`
-      INSERT INTO goals (target_weight, mode, initial_intensity, start_date, start_weight, active)
-      VALUES (?, ?, ?, ?, ?, 1)
-    `);
-
-        const result = stmt.run(target_weight, mode, initial_intensity, start_date, start_weight);
-
-        const goal = db
-            .prepare("SELECT * FROM goals WHERE id = ?")
-            .get(result.lastInsertRowid) as GoalRow;
+        const goal = await prisma.$transaction(async (tx) => {
+            await tx.goal.updateMany({
+                where: { user_id: auth.userId, active: true },
+                data: { active: false },
+            });
+            return tx.goal.create({
+                data: {
+                    user_id: auth.userId,
+                    target_weight: Number(target_weight),
+                    mode,
+                    initial_intensity: Number(initial_intensity),
+                    start_date,
+                    start_weight: Number(start_weight),
+                    active: true,
+                },
+            });
+        });
 
         return NextResponse.json(goal, { status: 201 });
     } catch (error) {
@@ -89,8 +95,10 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// DELETE: Deactivate or delete a goal
 export async function DELETE(request: NextRequest) {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get("id");
@@ -102,8 +110,10 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        const db = getDb();
-        db.prepare("UPDATE goals SET active = 0, updated_at = datetime('now') WHERE id = ?").run(id);
+        await prisma.goal.updateMany({
+            where: { id: Number(id), user_id: auth.userId },
+            data: { active: false },
+        });
 
         return NextResponse.json({ success: true });
     } catch (error) {

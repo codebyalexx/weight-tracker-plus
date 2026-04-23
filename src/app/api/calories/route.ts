@@ -1,12 +1,16 @@
-import { getDb } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 
 export async function GET() {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
-        const db = getDb();
-        const entries = db
-            .prepare("SELECT * FROM calorie_entries ORDER BY date ASC")
-            .all();
+        const entries = await prisma.calorieEntry.findMany({
+            where: { user_id: auth.userId },
+            orderBy: { date: "asc" },
+        });
         return NextResponse.json(entries);
     } catch (error) {
         console.error("Error fetching calorie entries:", error);
@@ -18,6 +22,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
         const body = await request.json();
         const { date, calories_consumed, calories_burned, goal } = body;
@@ -31,22 +38,21 @@ export async function POST(request: NextRequest) {
 
         const validGoal = ["deficit", "maintenance", "bulk"].includes(goal) ? goal : "deficit";
 
-        const db = getDb();
-        const stmt = db.prepare(`
-      INSERT INTO calorie_entries (date, calories_consumed, calories_burned, goal, updated_at)
-      VALUES (?, ?, ?, ?, datetime('now'))
-      ON CONFLICT(date) DO UPDATE SET
-        calories_consumed = excluded.calories_consumed,
-        calories_burned = excluded.calories_burned,
-        goal = excluded.goal,
-        updated_at = datetime('now')
-    `);
-
-        stmt.run(date, calories_consumed, calories_burned, validGoal);
-
-        const entry = db
-            .prepare("SELECT * FROM calorie_entries WHERE date = ?")
-            .get(date);
+        const entry = await prisma.calorieEntry.upsert({
+            where: { user_id_date: { user_id: auth.userId, date } },
+            update: {
+                calories_consumed: Number(calories_consumed),
+                calories_burned: Number(calories_burned),
+                goal: validGoal,
+            },
+            create: {
+                user_id: auth.userId,
+                date,
+                calories_consumed: Number(calories_consumed),
+                calories_burned: Number(calories_burned),
+                goal: validGoal,
+            },
+        });
 
         return NextResponse.json(entry, { status: 201 });
     } catch (error) {
@@ -59,6 +65,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+    const auth = await requireUserId();
+    if (auth.response) return auth.response;
+
     try {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get("id");
@@ -70,8 +79,9 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        const db = getDb();
-        db.prepare("DELETE FROM calorie_entries WHERE id = ?").run(id);
+        await prisma.calorieEntry.deleteMany({
+            where: { id: Number(id), user_id: auth.userId },
+        });
 
         return NextResponse.json({ success: true });
     } catch (error) {
