@@ -59,10 +59,9 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 
-# Keep the Prisma CLI and dev deps needed for the one-shot import script
+# Dev deps kept for the one-shot SQLite import (run manually inside the container)
 COPY --from=builder /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 COPY --from=builder /app/node_modules/tsx ./node_modules/tsx
-COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 COPY --from=builder /app/node_modules/.bin/tsx ./node_modules/.bin/tsx
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/src/lib/sqliteImporter.ts ./src/lib/sqliteImporter.ts
