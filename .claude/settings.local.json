@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/justn/Development/WebProjects/**)",
+      "Bash(npx create-expo-app@latest kcalm-app --template tabs)",
+      "Bash(npx expo *)",
+      "Bash(npm install *)"
+    ]
+  }
+}
