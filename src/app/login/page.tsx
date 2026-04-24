@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
-import { Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock, LogIn, Sparkles } from "lucide-react";
 
 function GoogleIcon() {
     return (
@@ -20,6 +20,7 @@ function GoogleIcon() {
 
 export default function LoginPage() {
     const router = useRouter();
+    const [view, setView] = useState<"choice" | "login">("choice");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -61,6 +62,37 @@ export default function LoginPage() {
             setGoogleLoading(false);
         }
     };
+
+    if (view === "choice") {
+        return (
+            <div className="flex flex-col gap-8 items-center pt-6">
+                <div className="flex flex-col items-center gap-3">
+                    <Image src="/logo.svg" alt="Kcalm" width={64} height={64} className="object-contain" />
+                    <h1 className="text-3xl font-extrabold text-text-dark text-center">Bienvenue sur Kcalm !</h1>
+                    <p className="text-text-muted font-bold text-center text-sm">
+                        Ton compagnon pour un rapport sain à la nourriture.
+                    </p>
+                </div>
+
+                <div className="w-full flex flex-col gap-3">
+                    <Link
+                        href="/onboarding"
+                        className="tasty-button tasty-button-green w-full py-5 text-lg"
+                    >
+                        <Sparkles size={20} className="mr-2" strokeWidth={3} />
+                        Je suis nouveau
+                    </Link>
+                    <button
+                        onClick={() => setView("login")}
+                        className="tasty-button tasty-button-blue w-full py-5 text-lg"
+                    >
+                        <LogIn size={20} className="mr-2" strokeWidth={3} />
+                        Je suis déjà membre
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6 items-center pt-4">
@@ -135,12 +167,12 @@ export default function LoginPage() {
                 </form>
             </div>
 
-            <p className="text-text-muted font-bold text-sm">
-                Pas encore de compte ?{" "}
-                <Link href="/signup" className="text-main-blue underline">
-                    Inscris-toi
-                </Link>
-            </p>
+            <button
+                onClick={() => setView("choice")}
+                className="text-text-muted font-bold text-sm underline"
+            >
+                ← Retour
+            </button>
         </div>
     );
 }
