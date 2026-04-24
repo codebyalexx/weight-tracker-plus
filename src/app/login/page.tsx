@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -75,13 +74,14 @@ export default function LoginPage() {
                 </div>
 
                 <div className="w-full flex flex-col gap-3">
-                    <Link
-                        href="/onboarding"
-                        className="tasty-button tasty-button-green w-full py-5 text-lg"
+                    <button
+                        type="button"
+                        onClick={() => router.push("/onboarding")}
+                        className="tasty-button tasty-button-green w-full py-5 text-lg cursor-pointer"
                     >
                         <Sparkles size={20} className="mr-2" strokeWidth={3} />
                         Je suis nouveau
-                    </Link>
+                    </button>
                     <button
                         onClick={() => setView("login")}
                         className="tasty-button tasty-button-blue w-full py-5 text-lg"
