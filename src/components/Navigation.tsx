@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Menu, X, Flame, BarChart2, CalendarDays, Database, LogOut, User as UserIcon } from "lucide-react";
+import { Menu, X, Flame, BarChart2, CalendarDays, LogOut, User as UserIcon } from "lucide-react";
 import { useSession, signOut } from "@/lib/auth-client";
 
 export default function Navigation() {
@@ -73,14 +73,6 @@ export default function Navigation() {
           >
             <BarChart2 className="text-[#1cb0f6]" size={24} strokeWidth={2.5} />
             Insights
-          </Link>
-          <Link
-            href="/import"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-4 border-b-2 border-gray-100 hover:bg-gray-50 active:bg-gray-100"
-          >
-            <Database className="text-[#58cc02]" size={24} strokeWidth={2.5} />
-            Importer mes données
           </Link>
           <button
             onClick={onLogout}

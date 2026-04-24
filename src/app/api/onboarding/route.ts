@@ -18,10 +18,11 @@ export async function POST(request: NextRequest) {
         }
 
         const today = new Date().toISOString().split("T")[0];
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 
         await prisma.weightEntry.upsert({
-            where: { user_id_date: { user_id: auth.userId, date: today } },
-            create: { user_id: auth.userId, date: today, weight: Number(currentWeight) },
+            where: { user_id_date: { user_id: auth.userId, date: yesterday } },
+            create: { user_id: auth.userId, date: yesterday, weight: Number(currentWeight) },
             update: { weight: Number(currentWeight) },
         });
 
