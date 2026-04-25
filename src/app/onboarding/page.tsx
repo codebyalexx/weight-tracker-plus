@@ -107,20 +107,13 @@ export default function OnboardingPage() {
         setLoading(true);
         saveToStorage();
         try {
-            const result = await signUp.email({ email, password, name, callbackURL: "/" });
+            const result = await signUp.email({ email, password, name });
             if (result.error) {
                 setError(result.error.message ?? "Inscription impossible");
                 setLoading(false);
                 return;
             }
-            await fetch("/api/onboarding", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(getPayload()),
-            });
-            localStorage.removeItem(STORAGE_KEY);
-            router.push("/");
-            router.refresh();
+            router.push("/onboarding/complete");
         } catch (err) {
             console.error(err);
             setError("Inscription impossible");

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
-import { User, Target, Pencil, Check, X, Scale, Flame, Dumbbell } from "lucide-react";
+import { User, Target, Pencil, Check, X, Scale, Flame, Dumbbell, Activity } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -110,13 +110,18 @@ export default function ProfilePage() {
         if (!goal) return;
         setSaving(true);
         const rawIntensity = Number(goalForm.initial_intensity);
-        const intensity = goalForm.mode === "cut" ? -Math.abs(rawIntensity) : Math.abs(rawIntensity);
+        const intensity =
+            goalForm.mode === "maintain" ? 0
+            : goalForm.mode === "cut" ? -Math.abs(rawIntensity)
+            : Math.abs(rawIntensity);
+        const targetWeight =
+            goalForm.mode === "maintain" ? goal.start_weight : Number(goalForm.target_weight);
         try {
             const res = await fetch("/api/profile", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    target_weight: Number(goalForm.target_weight),
+                    target_weight: targetWeight,
                     mode: goalForm.mode,
                     initial_intensity: intensity,
                 }),
@@ -132,9 +137,9 @@ export default function ProfilePage() {
         }
     };
 
-    const modeLabel = (mode: string) => mode === "cut" ? "Sèche" : "Prise de masse";
-    const modeColor = (mode: string) => mode === "cut" ? "text-main-orange" : "text-main-green";
-    const modeBg = (mode: string) => mode === "cut" ? "bg-main-orange/10" : "bg-main-green/10";
+    const modeLabel = (mode: string) => mode === "cut" ? "Sèche" : mode === "maintain" ? "Maintien" : "Prise de masse";
+    const modeColor = (mode: string) => mode === "cut" ? "text-main-orange" : mode === "maintain" ? "text-main-blue" : "text-main-green";
+    const modeBg = (mode: string) => mode === "cut" ? "bg-main-orange/10" : mode === "maintain" ? "bg-main-blue/10" : "bg-main-green/10";
 
     if (loading || isPending) {
         return (
@@ -305,10 +310,11 @@ export default function ProfilePage() {
                         {/* Mode selector */}
                         <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-bold text-text-muted uppercase tracking-wider">Mode</label>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-3 gap-2">
                                 {[
                                     { value: "cut", label: "Sèche", icon: Flame, color: "text-main-orange", bg: "bg-main-orange/10", border: "border-main-orange" },
-                                    { value: "bulk", label: "Prise de masse", icon: Dumbbell, color: "text-main-green", bg: "bg-main-green/10", border: "border-main-green" },
+                                    { value: "maintain", label: "Maintien", icon: Activity, color: "text-main-blue", bg: "bg-main-blue/10", border: "border-main-blue" },
+                                    { value: "bulk", label: "Masse", icon: Dumbbell, color: "text-main-green", bg: "bg-main-green/10", border: "border-main-green" },
                                 ].map(opt => {
                                     const Icon = opt.icon;
                                     const selected = goalForm.mode === opt.value;
@@ -317,9 +323,9 @@ export default function ProfilePage() {
                                             key={opt.value}
                                             type="button"
                                             onClick={() => setGoalForm(f => ({ ...f, mode: opt.value }))}
-                                            className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 font-bold transition-all ${selected ? `${opt.border} ${opt.bg} ${opt.color}` : "border-gray-200 text-text-muted hover:border-gray-300"}`}
+                                            className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 font-bold transition-all text-xs ${selected ? `${opt.border} ${opt.bg} ${opt.color}` : "border-gray-200 text-text-muted hover:border-gray-300"}`}
                                         >
-                                            <Icon size={22} strokeWidth={2.5} />
+                                            <Icon size={20} strokeWidth={2.5} />
                                             {opt.label}
                                         </button>
                                     );
@@ -327,34 +333,38 @@ export default function ProfilePage() {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-text-muted uppercase tracking-wider">Poids cible (kg)</label>
-                            <input
-                                type="number"
-                                value={goalForm.target_weight}
-                                onChange={e => setGoalForm(f => ({ ...f, target_weight: e.target.value }))}
-                                className="border-2 border-gray-200 rounded-xl px-4 py-3 font-bold text-text-dark focus:outline-none focus:border-main-blue transition-colors"
-                                placeholder="Ex : 75"
-                                step={0.1}
-                                min={30}
-                                max={300}
-                            />
-                        </div>
+                        {goalForm.mode !== "maintain" && (
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-bold text-text-muted uppercase tracking-wider">Poids cible (kg)</label>
+                                <input
+                                    type="number"
+                                    value={goalForm.target_weight}
+                                    onChange={e => setGoalForm(f => ({ ...f, target_weight: e.target.value }))}
+                                    className="border-2 border-gray-200 rounded-xl px-4 py-3 font-bold text-text-dark focus:outline-none focus:border-main-blue transition-colors"
+                                    placeholder="Ex : 75"
+                                    step={0.1}
+                                    min={30}
+                                    max={300}
+                                />
+                            </div>
+                        )}
 
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-text-muted uppercase tracking-wider">
-                                {goalForm.mode === "cut" ? "Déficit" : "Surplus"} journalier (kcal)
-                            </label>
-                            <input
-                                type="number"
-                                value={goalForm.initial_intensity}
-                                onChange={e => setGoalForm(f => ({ ...f, initial_intensity: e.target.value }))}
-                                className="border-2 border-gray-200 rounded-xl px-4 py-3 font-bold text-text-dark focus:outline-none focus:border-main-blue transition-colors"
-                                placeholder={goalForm.mode === "cut" ? "Ex : 200" : "Ex : 100"}
-                                min={0}
-                                max={1000}
-                            />
-                        </div>
+                        {goalForm.mode !== "maintain" && (
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-bold text-text-muted uppercase tracking-wider">
+                                    {goalForm.mode === "cut" ? "Déficit" : "Surplus"} journalier (kcal)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={goalForm.initial_intensity}
+                                    onChange={e => setGoalForm(f => ({ ...f, initial_intensity: e.target.value }))}
+                                    className="border-2 border-gray-200 rounded-xl px-4 py-3 font-bold text-text-dark focus:outline-none focus:border-main-blue transition-colors"
+                                    placeholder={goalForm.mode === "cut" ? "Ex : 200" : "Ex : 100"}
+                                    min={0}
+                                    max={1000}
+                                />
+                            </div>
+                        )}
 
                         <div className="flex gap-3 mt-1">
                             <button
@@ -379,6 +389,8 @@ export default function ProfilePage() {
                         <div className={`flex items-center gap-3 rounded-xl px-4 py-3 ${modeBg(goal.mode)}`}>
                             {goal.mode === "cut"
                                 ? <Flame size={20} className="text-main-orange" strokeWidth={2.5} />
+                                : goal.mode === "maintain"
+                                ? <Activity size={20} className="text-main-blue" strokeWidth={2.5} />
                                 : <Dumbbell size={20} className="text-main-green" strokeWidth={2.5} />
                             }
                             <span className={`font-extrabold text-lg ${modeColor(goal.mode)}`}>
@@ -391,18 +403,22 @@ export default function ProfilePage() {
                                 <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Poids départ</span>
                                 <span className="font-extrabold text-text-dark text-lg">{goal.start_weight} kg</span>
                             </div>
-                            <div className="bg-gray-50 rounded-xl px-4 py-3 flex flex-col gap-0.5">
-                                <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Poids cible</span>
-                                <span className="font-extrabold text-text-dark text-lg">{goal.target_weight} kg</span>
-                            </div>
-                            <div className="bg-gray-50 rounded-xl px-4 py-3 flex flex-col gap-0.5">
-                                <span className="text-xs font-bold text-text-muted uppercase tracking-wider">
-                                    {goal.mode === "cut" ? "Déficit/jour" : "Surplus/jour"}
-                                </span>
-                                <span className={`font-extrabold text-lg ${goal.mode === "cut" ? "text-main-orange" : "text-main-green"}`}>
-                                    {goal.mode === "cut" ? "−" : "+"}{Math.abs(goal.initial_intensity)} kcal
-                                </span>
-                            </div>
+                            {goal.mode !== "maintain" && (
+                                <div className="bg-gray-50 rounded-xl px-4 py-3 flex flex-col gap-0.5">
+                                    <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Poids cible</span>
+                                    <span className="font-extrabold text-text-dark text-lg">{goal.target_weight} kg</span>
+                                </div>
+                            )}
+                            {goal.mode !== "maintain" && (
+                                <div className="bg-gray-50 rounded-xl px-4 py-3 flex flex-col gap-0.5">
+                                    <span className="text-xs font-bold text-text-muted uppercase tracking-wider">
+                                        {goal.mode === "cut" ? "Déficit/jour" : "Surplus/jour"}
+                                    </span>
+                                    <span className={`font-extrabold text-lg ${goal.mode === "cut" ? "text-main-orange" : "text-main-green"}`}>
+                                        {goal.mode === "cut" ? "−" : "+"}{Math.abs(goal.initial_intensity)} kcal
+                                    </span>
+                                </div>
+                            )}
                             <div className="bg-gray-50 rounded-xl px-4 py-3 flex flex-col gap-0.5">
                                 <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Depuis</span>
                                 <span className="font-extrabold text-text-dark">

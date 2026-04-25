@@ -33,34 +33,33 @@ export async function POST(request: NextRequest) {
             update: { weight: Number(currentWeight) },
         });
 
-        if (mode !== "maintain") {
-            if (!targetWeight) {
-                return NextResponse.json(
-                    { error: "targetWeight is required for cut/bulk" },
-                    { status: 400 }
-                );
-            }
-
-            const intensity = mode === "cut" ? -200 : 100;
-
-            await prisma.$transaction(async (tx) => {
-                await tx.goal.updateMany({
-                    where: { user_id: auth.userId, active: true },
-                    data: { active: false },
-                });
-                await tx.goal.create({
-                    data: {
-                        user_id: auth.userId,
-                        target_weight: Number(targetWeight),
-                        mode: mode === "cut" ? "cut" : "bulk",
-                        initial_intensity: intensity,
-                        start_date: today,
-                        start_weight: Number(currentWeight),
-                        active: true,
-                    },
-                });
-            });
+        if (mode !== "maintain" && !targetWeight) {
+            return NextResponse.json(
+                { error: "targetWeight is required for cut/bulk" },
+                { status: 400 }
+            );
         }
+
+        const intensity = mode === "cut" ? -200 : mode === "bulk" ? 100 : 0;
+        const resolvedTargetWeight = mode === "maintain" ? Number(currentWeight) : Number(targetWeight);
+
+        await prisma.$transaction(async (tx) => {
+            await tx.goal.updateMany({
+                where: { user_id: auth.userId, active: true },
+                data: { active: false },
+            });
+            await tx.goal.create({
+                data: {
+                    user_id: auth.userId,
+                    target_weight: resolvedTargetWeight,
+                    mode,
+                    initial_intensity: intensity,
+                    start_date: today,
+                    start_weight: Number(currentWeight),
+                    active: true,
+                },
+            });
+        });
 
         return NextResponse.json({ success: true }, { status: 201 });
     } catch (error) {
