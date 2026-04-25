@@ -4,7 +4,11 @@
       "Read(//c/Users/justn/Development/WebProjects/**)",
       "Bash(npx create-expo-app@latest kcalm-app --template tabs)",
       "Bash(npx expo *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(pnpm tsc *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

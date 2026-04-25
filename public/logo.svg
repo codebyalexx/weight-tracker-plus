@@ -1,10 +1,32 @@
-<svg width="100%" viewBox="0 0 220 220" role="img" xmlns="http://www.w3.org/2000/svg" style="">
-  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Kcalm icône</title>
-  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Icône de l'application Kcalm, une flamme apaisée sur fond teal</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-110 -110 220 220" width="512" height="512">
+  <title>Kilocal</title>
+  <desc>Mascotte flamme cartoon aux couleurs Duolingo</desc>
 
-  <rect x="40" y="40" width="140" height="140" rx="36" fill="#1D9E75" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Ombre portée au sol -->
+  <ellipse cx="0" cy="112" rx="70" ry="6" fill="#58CC02" opacity="0.18"/>
 
-  <path d="M 110 158 C 86 140 70 118 72 94 C 74 70 90 57 105 53 C 108 43 116 49 115 63 C 130 54 145 66 147 90 C 149 114 130 140 110 158 Z" fill="white" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Corps principal de la flamme -->
+  <path d="M 0 -95 C 55 -60, 92 5, 82 55 C 77 90, 45 106, 0 108 C -45 106, -77 90, -82 55 C -92 5, -55 -60, 0 -95 Z" fill="#58CC02"/>
 
-  <ellipse cx="109" cy="103" rx="11" ry="16" fill="#1D9E75" opacity="0.38" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.38;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Coeur intérieur de la flamme (vert clair) -->
+  <path d="M 0 -58 C 28 -38, 44 -10, 36 14 L -36 14 C -44 -10, -28 -38, 0 -58 Z" fill="#89E219"/>
+
+  <!-- Yeux : blancs -->
+  <ellipse cx="-24" cy="30" rx="15" ry="19" fill="#FFFFFF"/>
+  <ellipse cx="24" cy="30" rx="15" ry="19" fill="#FFFFFF"/>
+
+  <!-- Pupilles -->
+  <ellipse cx="-22" cy="34" rx="7" ry="9" fill="#2B2B2B"/>
+  <ellipse cx="26" cy="34" rx="7" ry="9" fill="#2B2B2B"/>
+
+  <!-- Reflets dans les yeux -->
+  <circle cx="-19" cy="28" r="3" fill="#FFFFFF"/>
+  <circle cx="29" cy="28" r="3" fill="#FFFFFF"/>
+
+  <!-- Joues rosées (légères) -->
+  <ellipse cx="-48" cy="62" rx="10" ry="6" fill="#46A302" opacity="0.45"/>
+  <ellipse cx="48" cy="62" rx="10" ry="6" fill="#46A302" opacity="0.45"/>
+
+  <!-- Sourire -->
+  <path d="M -19 66 Q 0 88 19 66" fill="none" stroke="#2B2B2B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
