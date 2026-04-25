@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { getSession } from "@/lib/auth-client";
 
 const STORAGE_KEY = "kcalm_onboarding_v1";
 
@@ -11,20 +12,47 @@ export default function OnboardingCompletePage() {
 
     useEffect(() => {
         const complete = async () => {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+                router.replace("/");
+                return;
+            }
+
             try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    const data = JSON.parse(raw);
-                    await fetch("/api/onboarding", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(data),
-                    });
+                const data = JSON.parse(raw);
+
+                // After OAuth redirect, the session cookie may not be readable
+                // by the server immediately — poll until the session is confirmed.
+                let sessionEstablished = false;
+                for (let i = 0; i < 8; i++) {
+                    const session = await getSession();
+                    if (session?.data?.user?.id) {
+                        sessionEstablished = true;
+                        break;
+                    }
+                    await new Promise((r) => setTimeout(r, 500));
+                }
+
+                if (!sessionEstablished) {
+                    router.replace("/login");
+                    return;
+                }
+
+                const res = await fetch("/api/onboarding", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
+                });
+
+                if (res.ok) {
                     localStorage.removeItem(STORAGE_KEY);
+                } else {
+                    console.error("Onboarding API error:", res.status, await res.text());
                 }
             } catch (err) {
                 console.error("Onboarding completion error:", err);
             }
+
             router.replace("/");
         };
 
