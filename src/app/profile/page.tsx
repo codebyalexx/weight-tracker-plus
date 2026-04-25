@@ -13,6 +13,7 @@ type ProfileUser = {
     email: string;
     image: string | null;
     height: number | null;
+    sex: string | null;
     createdAt: string;
 };
 
@@ -38,7 +39,7 @@ export default function ProfilePage() {
     const [editingGoal, setEditingGoal] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    const [profileForm, setProfileForm] = useState({ name: "", height: "" });
+    const [profileForm, setProfileForm] = useState({ name: "", height: "", sex: "" });
     const [goalForm, setGoalForm] = useState({ target_weight: "", mode: "cut", initial_intensity: "" });
 
     const fetchProfile = useCallback(async () => {
@@ -67,6 +68,7 @@ export default function ProfilePage() {
         setProfileForm({
             name: profileUser?.name ?? "",
             height: profileUser?.height ? String(profileUser.height) : "",
+            sex: profileUser?.sex ?? "",
         });
         setEditingProfile(true);
     };
@@ -90,6 +92,7 @@ export default function ProfilePage() {
                 body: JSON.stringify({
                     name: profileForm.name,
                     height: profileForm.height ? Number(profileForm.height) : null,
+                    sex: profileForm.sex || null,
                 }),
             });
             if (!res.ok) return;
@@ -211,6 +214,29 @@ export default function ProfilePage() {
                                 max={250}
                             />
                         </div>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-text-muted uppercase tracking-wider">Sexe</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                {([
+                                    { value: "female", emoji: "👩", label: "Femme" },
+                                    { value: "male", emoji: "👨", label: "Homme" },
+                                ] as const).map(({ value, emoji, label }) => (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        onClick={() => setProfileForm(f => ({ ...f, sex: f.sex === value ? "" : value }))}
+                                        className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 font-bold transition-all ${
+                                            profileForm.sex === value
+                                                ? "border-main-blue bg-blue-50 text-main-blue"
+                                                : "border-gray-200 text-text-muted hover:border-gray-300"
+                                        }`}
+                                    >
+                                        <span className="text-xl">{emoji}</span>
+                                        <span className="text-sm">{label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                         <div className="flex gap-3 mt-1">
                             <button
                                 onClick={saveProfile}
@@ -229,13 +255,24 @@ export default function ProfilePage() {
                         </div>
                     </div>
                 ) : (
-                    <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
-                        <Scale size={18} className="text-text-muted shrink-0" strokeWidth={2.5} />
-                        <div className="flex flex-col">
-                            <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Taille</span>
-                            <span className="font-extrabold text-text-dark">
-                                {profileUser?.height ? `${profileUser.height} cm` : "Non renseignée"}
-                            </span>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
+                            <Scale size={18} className="text-text-muted shrink-0" strokeWidth={2.5} />
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Taille</span>
+                                <span className="font-extrabold text-text-dark">
+                                    {profileUser?.height ? `${profileUser.height} cm` : "—"}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
+                            <User size={18} className="text-text-muted shrink-0" strokeWidth={2.5} />
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-text-muted uppercase tracking-wider">Sexe</span>
+                                <span className="font-extrabold text-text-dark">
+                                    {profileUser?.sex === "male" ? "Homme" : profileUser?.sex === "female" ? "Femme" : "—"}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 )}

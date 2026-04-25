@@ -4,12 +4,13 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signUp, signIn } from "@/lib/auth-client";
-import { Scale, User as UserIcon, Target, Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
+import { Scale, User as UserIcon, Target, Mail, Lock, ArrowRight, Sparkles, Ruler } from "lucide-react";
 
 const STORAGE_KEY = "kcalm_onboarding_v1";
 const KCAL_PER_KG = 7700;
 
 type Mode = "cut" | "maintain" | "bulk";
+type Sex = "male" | "female";
 
 function GoogleIcon() {
     return (
@@ -54,6 +55,8 @@ export default function OnboardingPage() {
 
     const [currentWeight, setCurrentWeight] = useState("");
     const [age, setAge] = useState("");
+    const [height, setHeight] = useState("");
+    const [sex, setSex] = useState<Sex | null>(null);
 
     const [mode, setMode] = useState<Mode | null>(null);
     const [targetWeight, setTargetWeight] = useState("");
@@ -70,7 +73,7 @@ export default function OnboardingPage() {
     const diff = Math.abs(tw - cw);
     const timeEstimate = mode && mode !== "maintain" ? estimateTime(diff, mode) : "";
 
-    const step1Valid = currentWeight && age && parseFloat(currentWeight) > 0 && parseInt(age) > 0;
+    const step1Valid = currentWeight && age && sex && parseFloat(currentWeight) > 0 && parseInt(age) > 0;
     const step2Valid =
         mode !== null &&
         (mode === "maintain" || (targetWeight && parseFloat(targetWeight) > 0));
@@ -79,6 +82,8 @@ export default function OnboardingPage() {
         currentWeight: cw,
         targetWeight: mode === "maintain" ? cw : tw,
         mode: mode!,
+        height: height ? parseInt(height) : null,
+        sex: sex!,
     });
 
     const saveToStorage = () =>
@@ -165,6 +170,27 @@ export default function OnboardingPage() {
 
                         <div>
                             <label className="font-bold text-text-dark text-sm mb-1.5 flex items-center gap-2">
+                                <Ruler size={16} /> Ta taille
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    inputMode="numeric"
+                                    min="100"
+                                    max="250"
+                                    value={height}
+                                    onChange={(e) => setHeight(e.target.value)}
+                                    className="w-full border-2 border-gray-200 rounded-xl p-3 pr-12 font-bold focus:outline-none focus:border-main-green bg-gray-50"
+                                    placeholder="175"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted font-bold text-sm">
+                                    cm
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="font-bold text-text-dark text-sm mb-1.5 flex items-center gap-2">
                                 <UserIcon size={16} /> Ton âge
                             </label>
                             <div className="relative">
@@ -181,6 +207,35 @@ export default function OnboardingPage() {
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted font-bold text-sm">
                                     ans
                                 </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="font-bold text-text-dark text-sm mb-1.5 flex items-center gap-2">
+                                <UserIcon size={16} /> Ton sexe
+                            </label>
+                            <div className="grid grid-cols-2 gap-3">
+                                {([
+                                    { value: "female" as Sex, emoji: "👩", label: "Femme" },
+                                    { value: "male" as Sex, emoji: "👨", label: "Homme" },
+                                ] as const).map(({ value, emoji, label }) => (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        onClick={() => setSex(value)}
+                                        className={`border-2 rounded-2xl p-3 flex items-center justify-center gap-2 font-bold text-text-dark transition-all cursor-pointer ${
+                                            sex === value
+                                                ? "border-main-green bg-green-50"
+                                                : "border-gray-200 bg-white hover:border-gray-300"
+                                        }`}
+                                    >
+                                        <span className="text-xl">{emoji}</span>
+                                        <span className="text-sm">{label}</span>
+                                        {sex === value && (
+                                            <span className="text-main-green font-extrabold">✓</span>
+                                        )}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>

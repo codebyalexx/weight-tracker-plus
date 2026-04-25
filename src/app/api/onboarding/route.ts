@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     try {
         const body = await request.json();
-        const { currentWeight, targetWeight, mode } = body;
+        const { currentWeight, targetWeight, mode, height, sex } = body;
 
         if (!currentWeight || !mode) {
             return NextResponse.json(
@@ -19,6 +19,13 @@ export async function POST(request: NextRequest) {
 
         const today = new Date().toISOString().split("T")[0];
         const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
+        const userUpdateData: { height?: number; sex?: string } = {};
+        if (height) userUpdateData.height = Number(height);
+        if (sex) userUpdateData.sex = String(sex);
+        if (Object.keys(userUpdateData).length > 0) {
+            await prisma.user.update({ where: { id: auth.userId }, data: userUpdateData });
+        }
 
         await prisma.weightEntry.upsert({
             where: { user_id_date: { user_id: auth.userId, date: yesterday } },

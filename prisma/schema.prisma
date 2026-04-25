@@ -20,6 +20,7 @@ model User {
   emailVerified Boolean
   image         String?
   height        Int?
+  sex           String?
   createdAt     DateTime
   updatedAt     DateTime
 

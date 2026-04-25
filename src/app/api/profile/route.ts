@@ -10,7 +10,7 @@ export async function GET() {
         const [user, goal] = await Promise.all([
             prisma.user.findUnique({
                 where: { id: auth.userId },
-                select: { id: true, name: true, email: true, image: true, height: true, createdAt: true },
+                select: { id: true, name: true, email: true, image: true, height: true, sex: true, createdAt: true },
             }),
             prisma.goal.findFirst({
                 where: { user_id: auth.userId, active: true },
@@ -31,18 +31,19 @@ export async function PATCH(request: NextRequest) {
 
     try {
         const body = await request.json();
-        const { name, height, target_weight, mode, initial_intensity } = body;
+        const { name, height, sex, target_weight, mode, initial_intensity } = body;
 
-        const userUpdateData: { name?: string; height?: number | null } = {};
+        const userUpdateData: { name?: string; height?: number | null; sex?: string | null } = {};
         if (name !== undefined) userUpdateData.name = String(name).trim();
         if (height !== undefined) userUpdateData.height = height ? Number(height) : null;
+        if (sex !== undefined) userUpdateData.sex = sex ? String(sex) : null;
 
         let user = null;
         if (Object.keys(userUpdateData).length > 0) {
             user = await prisma.user.update({
                 where: { id: auth.userId },
                 data: userUpdateData,
-                select: { id: true, name: true, email: true, image: true, height: true, createdAt: true },
+                select: { id: true, name: true, email: true, image: true, height: true, sex: true, createdAt: true },
             });
         }
 
